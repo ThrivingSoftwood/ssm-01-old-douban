@@ -26,7 +26,7 @@
     <!--Mapping: 前端访问的 URL 路径，例如 http://localhost:8080/context/uploads/1.jpg-->
     <!--Location: 后端硬盘的绝对路径 (注意必须以 file: 开头，且以 / 结尾)-->
     <!--Mac/Linux 写法-->
-    <mvc:resources mapping="/upload/**" location="file:///Users/${改为对应用户名}/tomcat-upload/"/>
+    <mvc:resources mapping="/upload/**" location="file:///Users/${改为对应的用户名}/tomcat-upload/"/>
     <!-- Windows 写法 (注意斜杠方向) -->
     <!-- <mvc:resources mapping="/uploads/**" location="file:D:/upload_data/"/> -->
 

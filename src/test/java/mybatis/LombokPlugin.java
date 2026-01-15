@@ -1,4 +1,4 @@
-package thriving.softwood.generator.mybatis;
+package mybatis;
 
 import java.util.List;
 

@@ -6,7 +6,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd">
 
     <!--引入外部属性资源文件-->
-    <context:property-placeholder location="classpath:configuration/database/mysql/database.properties"/>
+    <context:property-placeholder location="classpath:configuration/database/mysql/mysql.properties"/>
     <!--配置组件-->
     <context:component-scan base-package="thriving.softwood">
         <!--扫描出 Controller 外的所有组件-->
