@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring.xsd">
+
+    <!--引入外部属性资源文件-->
+    <context:property-placeholder location="classpath:configuration/database/mysql/database.properties"/>
+    <!--配置组件-->
+    <context:component-scan base-package="thriving.softwood">
+        <!--扫描出 Controller 外的所有组件-->
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <!--配置声明式事务 begin-->
+    <!--配置数据源-->
+    <bean class="com.alibaba.druid.pool.DruidDataSource" id="dataSource">
+        <property name="driverClassName" value="${mysql.driver}"/>
+        <property name="username" value="${mysql.localhost.username}"/>
+        <property name="password" value="${mysql.localhost.password}"/>
+        <property name="url" value="${mysql.url.localhost.movie}"/>
+    </bean>
+
+    <!--配置声明式事务-->
+    <bean class="org.springframework.jdbc.datasource.DataSourceTransactionManager" id="transactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--配置声明式事务类型 begin-->
+    <!--基于驱动-->
+    <!--<tx:annotation-driven transaction-manager="transactionManager"/>-->
+    <!--基于 xml begin-->
+    <tx:advice id="txAdvice">
+        <tx:attributes>
+            <tx:method name="add*"/>
+            <tx:method name="insert*"/>
+            <tx:method name="create*"/>
+            <tx:method name="init*"/>
+            <tx:method name="new*"/>
+            <tx:method name="instantiate*"/>
+            <tx:method name="instance*"/>
+            <tx:method name="modify*"/>
+            <tx:method name="update*"/>
+            <tx:method name="refresh*"/>
+            <tx:method name="reset*"/>
+            <tx:method name="fix*"/>
+            <tx:method name="truncate*"/>
+            <tx:method name="purge*"/>
+            <tx:method name="wipe*"/>
+            <tx:method name="remove*"/>
+            <tx:method name="delete*"/>
+            <tx:method name="get*" read-only="true" propagation="SUPPORTS"/>
+            <tx:method name="qry*" read-only="true" propagation="SUPPORTS"/>
+            <tx:method name="query*" read-only="true" propagation="SUPPORTS"/>
+            <tx:method name="list*" read-only="true" propagation="SUPPORTS"/>
+        </tx:attributes>
+    </tx:advice>
+    <aop:config>
+        <aop:pointcut id="transactionCut" expression="execution(* thriving.softwood.api.*.*(..))"/>
+        <!--必须将切点和通知绑定起来，事务才会生效-->
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="transactionCut"/>
+    </aop:config>
+    <!--基于 xml end-->
+    <!--配置声明式事务类型 end-->
+
+    <!--配置 sqlSessionFactory begin-->
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean" id="sqlSessionFactory">
+        <!--指定 spring 中的数据源-->
+        <property name="dataSource" ref="dataSource"/>
+        <!--指定 mybatis 配置文件位置-->
+        <property name="configLocation" value="classpath:configuration/mybatis/mybatis.xml"/>
+        <property name="mapperLocations" value="classpath:thriving/softwood/dao/mapper/**/*.xml"/>
+    </bean>
+    <!--将 Mapper.java 映射器接口托管给 SqlSessionFactory-->
+    <mybatis:scan base-package="thriving.softwood.dao.mapper"/>
+    <!--配置 sqlSessionFactory begin-->
+
+</beans>

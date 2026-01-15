@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-config.dtd">
+<!--根节点-->
+<configuration>
+    <!--Module 2 : mybatis 设置选项,可以改变其运行时的行为-->
+    <settings>
+        <!--是否开启驼峰命名自动映射，默认为 false-->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <!--二级缓存开关,默认为 true-->
+        <setting name="cacheEnabled" value="false"/>
+        <!--以下部分了解即可 begin-->
+        <!--是否支持"别名-属性"映射,默认为 true;设置为 false 时如果在结果集找不到对应列时会报错-->
+        <setting name="useColumnLabel" value="true"/>
+        <!--强制使用自动生成主键,默认为 false;根据业务实际需求使用-->
+        <setting name="useGeneratedKeys" value="false"/>
+        <!--指定发现自动映射目标未知列（或未知属性类型）的行为。默认为 NONE:不做任何反应;其他选项:
+                WARNING: 输出警告日志（'org.apache.ibatis.session.AutoMappingUnknownColumnBehavior' 的日志等级必须设置为 WARN）
+                FAILING: 映射失败 (抛出 SqlSessionException)-->
+        <setting name="autoMappingUnknownColumnBehavior" value="NONE"/>
+        <!--配置默认的执行器,默认为 SIMPLE。
+                SIMPLE 就是普通的执行器；
+                REUSE 执行器会重用预处理语句（PreparedStatement）；
+                BATCH 执行器不仅重用语句还会执行批量更新。-->
+        <setting name="defaultExecutorType" value="REUSE"/>
+        <!--查询超时时间,单位为秒-->
+        <setting name="defaultStatementTimeout" value="6000"/>
+        <!--当没有为参数指定特定的 JDBC 类型时，空值的默认 JDBC 类型,默认为 OTHER。
+            某些数据库驱动需要指定列的 JDBC 类型，多数情况直接用一般类型即可，比如 NULL、VARCHAR 或 OTHER。-->
+        <setting name="jdbcTypeForNull" value="NULL"/>
+        <!--指定 MyBatis 所用日志的具体实现，未指定时将自动查找。
+            查找顺序:SLF4J >> Apache Commons Logging >> Log4j 2 >> Log4j(3.5.9起废弃) >> JDK logging-->
+        <setting name="logImpl" value="SLF4J"/>
+        <!--懒加载相关配置 begin-->
+        <!-- 1. 开启全局延迟加载开关 -->
+        <setting name="lazyLoadingEnabled" value="false"/>
+
+        <!-- 2. 关闭“积极加载” (按需加载) -->
+        <!-- true:  (旧版默认) 只要访问任何属性，就加载所有延迟属性 -->
+        <!-- false: (新版默认) 只有真正访问该延迟属性时，才去加载它 -->
+        <setting name="aggressiveLazyLoading" value="false"/>
+
+        <!-- 3. (可选但推荐) 避免 toString, equals 等方法触发懒加载 -->
+        <!-- 默认值是: equals,clone,hashCode,toString -->
+        <!-- 下面这行把 toString 去掉了，这样你打印对象日志时就不会触发 SQL 了 -->
+        <setting name="lazyLoadTriggerMethods" value="equals,clone,hashCode,toString"/>
+        <!--懒加载相关配置 end-->
+        <!--以上部分了解即可 end-->
+    </settings>
+
+    <!--Module 4 : 插件(相当于拦截器)-->
+    <!--
+    MyBatis 允许你在映射语句执行过程中的某一点进行拦截调用。默认情况下，MyBatis 允许使用插件来拦截的方法调用包括：
+
+    ```
+    Executor (update, query, flushStatements, commit, rollback, getTransaction, close, isClosed)
+    ParameterHandler (getParameterObject, setParameters)
+    ResultSetHandler (handleResultSets, handleOutputParameters)
+    StatementHandler (prepare, parameterize, batch, update, query)
+    ```
+
+    这些类中方法的细节可以通过查看每个方法的签名来发现，或者直接查看 MyBatis 发行包中的源代码。 如果你想做的不仅仅是监控方法的调用，
+    那么你最好相当了解要重写的方法的行为。 因为在试图修改或重写已有方法的行为时，很可能会破坏 MyBatis 的核心模块。
+    这些都是更底层的类和方法，所以使用插件的时候要特别当心。
+    通过 MyBatis 提供的强大机制，使用插件是非常简单的，只需实现 Interceptor 接口，并指定想要拦截的方法签名即可。
+    上面的插件将会拦截在 Executor 实例中所有的 “update” 方法调用， 这里的 Executor 是负责执行底层映射语句的内部对象。
+
+    提示 覆盖配置类
+    除了用插件来修改 MyBatis 核心行为以外，还可以通过完全覆盖配置类来达到目的。只需继承配置类后覆盖其中的某个方法，
+    再把它传递到 SqlSessionFactoryBuilder.build(myConfig) 方法即可。再次重申，这可能会极大影响 MyBatis 的行为，务请慎之又慎。
+    -->
+    <plugins>
+        <!-- com.github.pagehelper为PageHelper类所在包名 -->
+        <plugin interceptor="com.github.pagehelper.PageInterceptor">
+            <property name="reasonable" value="true"/>
+            <property name="helperDialect" value="mysql"/>
+        </plugin>
+    </plugins>
+
+    <!--Module 6 : 数据库厂商标识. MyBatis 可以根据不同的数据库厂商执行不同的语句，这种多厂商的支持是基于映射语句中的 databaseId 属性。
+        MyBatis 会加载带有匹配当前数据库 databaseId 属性和所有不带 databaseId 属性的语句。 如果同时找到带有 databaseId
+        和不带 databaseId 的相同语句，则后者会被舍弃。
+    -->
+    <databaseIdProvider type="DB_VENDOR">
+        <!--name 为数据库厂商名称,value 为 databaseId-->
+        <!-- 设置后需要再 Mapper.xml 文件的同名不同语法的 sql 语句上标注 databaseId="value" 才可以正常使用-->
+        <property name="SQL Server" value="sqlserver"/>
+        <property name="DB2" value="db2"/>
+        <property name="Oracle" value="oracle" />
+    </databaseIdProvider>
+</configuration>

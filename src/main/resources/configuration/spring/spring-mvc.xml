@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd">
+    <!--1. controller 包路径,以下两种配置都可以-->
+    <context:component-scan base-package="thriving.softwood.controller"/>
+    <!--<context:component-scan base-package="thriving.softwood" use-default-filters="false">-->
+        <!--<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>-->
+    <!--</context:component-scan>-->
+
+    <!--2. 开启注解驱动(annotation-driven)-->
+    <mvc:annotation-driven/>
+
+    <!--3. 视图解析器(如果是前后端分离的项目则不需要)-->
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" id="viewResolver">
+        <property name="prefix" value="/WEB-INF/views"/>
+    </bean>
+
+    <!--4. 静态资源路径解析-->
+    <!--<mvc:resources mapping="" location=""/>-->
+    <mvc:default-servlet-handler/>
+
+    <!--5. 配置 tomcat 资源路径 begin-->
+    <!--Mapping: 前端访问的 URL 路径，例如 http://localhost:8080/context/uploads/1.jpg-->
+    <!--Location: 后端硬盘的绝对路径 (注意必须以 file: 开头，且以 / 结尾)-->
+    <!--Mac/Linux 写法-->
+    <mvc:resources mapping="/upload/**" location="file:///Users/${改为对应用户名}/tomcat-upload/"/>
+    <!-- Windows 写法 (注意斜杠方向) -->
+    <!-- <mvc:resources mapping="/uploads/**" location="file:D:/upload_data/"/> -->
+
+    <context:property-placeholder location="classpath:configuration/spring/spring.properties" file-encoding="UTF-8" />
+    <bean class="org.springframework.web.multipart.support.StandardServletMultipartResolver" id="multipartResolver"/>
+    <!--5. 配置 tomcat 资源路径 end-->
+
+</beans>

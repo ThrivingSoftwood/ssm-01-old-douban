@@ -1,0 +1,80 @@
+<!DOCTYPE generatorConfiguration PUBLIC
+ "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+ "https://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<!--根节点-->
+<generatorConfiguration>
+  <!--指定生成规则的上下文
+        id: 自定义即可
+        targetRuntime: 生成策略
+          Mybatis3DynamicSql 默认,生成动态 CRUD
+          Mybatis3 生成通用查询,可指定动态 where 条件
+          Mybatis3Simple 只生成简单 CRUD
+  -->
+  <context id="simple" targetRuntime="MyBatis3Simple">
+    <!--<context> 标签内部的子标签必须严格遵守以下顺序：
+            <property> (如果有)
+            <plugin> (你的插件必须放这里！) 👈
+            <commentGenerator> (注释生成器)
+            <jdbcConnection> (数据库连接)
+            <javaTypeResolver> (类型转换)
+            <javaModelGenerator> (实体类生成位置)
+            <sqlMapGenerator> (XML生成位置)
+            <javaClientGenerator> (Mapper接口生成位置)
+            <table> (表配置)
+    -->
+
+    <!-- 🌟 添加 Lombok 插件配置 -->
+    <plugin type="mybatis.LombokPlugin"/>
+
+    <!-- 👇 新增：官方序列化插件 -->
+    <plugin type="org.mybatis.generator.plugins.SerializablePlugin">
+      <!-- 这是一个配置项：是否忽略类中的字段来计算 serialVersionUID -->
+      <!-- true: 生成 private static final long serialVersionUID = 1L; (推荐用于通用开发) -->
+      <!-- false: 根据类结构计算 hash 值 (默认) -->
+      <property name="suppressMacAddress" value="true"/>
+    </plugin>
+
+    <!-- 🔥🔥🔥 3. 新增：Mapper 注解插件 🔥🔥🔥 -->
+    <!-- 作用：在生成的 Mapper 接口上添加 @Mapper 注解 -->
+    <plugin type="org.mybatis.generator.plugins.MapperAnnotationPlugin">
+      <!-- (可选) 如果你想用 @Repository，可以修改下面的 value -->
+      <!-- 默认就是 org.apache.ibatis.annotations.Mapper -->
+      <!-- <property name="mapperAnnotationClass" value="org.springframework.stereotype.Repository"/> -->
+    </plugin>
+
+    <!-- ⚠️ 注意：如果你配置了 ModelColumnPlugin 等其他插件，顺序很重要 -->
+
+    <!-- ... jdbcConnection, javaModelGenerator 等配置 ... -->
+    <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
+        connectionURL="jdbc:mysql://localhost:3306/movie"
+        userId="${改为对应用户名}"
+        password="${改为对应密码}" />
+
+    <!-- 🌟 核心配置：启用 Java 8 日期类型 (JSR-310) -->
+    <javaTypeResolver>
+      <!--
+         true: 使用 LocalDate, LocalTime, LocalDateTime
+         false: 使用 java.util.Date (默认)
+      -->
+      <property name="useJSR310Types" value="true"/>
+    </javaTypeResolver>
+
+    <!--1. pojo 生成-->
+    <javaModelGenerator targetPackage="thriving.softwood.pojo.entity" targetProject="src/test/java"/>
+    <!--2. mapper.xml 生成-->
+    <sqlMapGenerator targetPackage="thriving.softwood.dao.mapper" targetProject="src/test/java"/>
+    <!--3. mapper.java 生成-->
+    <!--注解绑定:<javaClientGenerator type="ANNOTATEDMAPPER" targetPackage="example.mapper" targetProject="src/main/test/java"/>-->
+    <!--接口绑定:-->
+    <javaClientGenerator type="XMLMapper" targetPackage="thriving.softwood.dao.mapper" targetProject="src/test/java"/>
+    <!--4. 配置生成范围 生成-->
+    <table tableName="cinema" domainObjectName="Cinema" mapperName="CinemaMapper" />
+    <table tableName="comment" domainObjectName="Comment" mapperName="CommentMapper" />
+    <table tableName="hall" domainObjectName="Hall" mapperName="HallMapper" />
+    <table tableName="movie" domainObjectName="Movie" mapperName="MovieMapper" />
+    <table tableName="order" domainObjectName="Order" mapperName="OrderMapper" />
+    <table tableName="schedule" domainObjectName="Schedule" mapperName="ScheduleMapper" />
+    <table tableName="user" domainObjectName="User" mapperName="UserMapper" />
+
+  </context>
+</generatorConfiguration>

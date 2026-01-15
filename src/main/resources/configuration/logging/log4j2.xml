@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+
+    <Properties>
+        <!--
+            🎨 开发环境专用格式：带颜色高亮
+            %highlight{%-5level}: 自动根据级别变色 (Info=绿, Warn=黄, Error=红)
+            %style{%c{1.}}{cyan}: 类名用青色显示
+            %t: 线程名
+        -->
+        <Property name="CONSOLE_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %highlight{%-5level} %style{%c{1.}}{cyan} - %msg%n</Property>
+
+        <!-- 生产环境文件格式 (无颜色字符，纯文本) -->
+        <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %c{1.} - %msg%n</Property>
+        <Property name="LOG_HOME">logs</Property>
+        <Property name="FILE_NAME">app</Property>
+    </Properties>
+
+    <Appenders>
+        <!--
+            ✅ [新增] 控制台 Appender
+            target="SYSTEM_OUT": 输出到标准输出
+        -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <!-- 禁用 bufferedIo，开发环境需要即时看到日志 -->
+            <PatternLayout pattern="${CONSOLE_PATTERN}"/>
+        </Console>
+
+        <!--
+           =============================================
+           1. INFO Appender (实际是全量日志)
+           建议：Info 文件包含 WARN 和 ERROR，这样在排查问题时
+           能看到错误发生前后的 INFO 上下文，不用在两个文件间切来切去。
+           =============================================
+        -->
+        <RollingRandomAccessFile name="InfoFile"
+                                 fileName="${LOG_HOME}/${FILE_NAME}-info.log"
+                                 filePattern="${LOG_HOME}/${FILE_NAME}-info-%d{yyyy-MM-dd}-%i.log.gz">
+            <!-- 性能关键参数 -->
+            <immediateFlush>false</immediateFlush>
+            <bufferSize>262144</bufferSize>
+
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+                <SizeBasedTriggeringPolicy size="1 GB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="50"/>
+
+            <!--
+                过滤器策略：
+                这里没有设置 Filter，默认接受 Root 传递过来的所有日志 (INFO及以上)。
+                如果你只想在 Info 文件里存 INFO 级别 (不存 WARN/ERROR)，可以解开下面的注释：
+            -->
+            <!--
+            <Filters>
+                <LevelRangeFilter minLevel="INFO" maxLevel="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            -->
+        </RollingRandomAccessFile>
+
+        <!--
+           =============================================
+           2. ERROR Appender (仅记录 ERROR 和 FATAL)
+           用于监控报警，文件体积通常较小。
+           =============================================
+        -->
+        <RollingRandomAccessFile name="ErrorFile"
+                                 fileName="${LOG_HOME}/${FILE_NAME}-error.log"
+                                 filePattern="${LOG_HOME}/${FILE_NAME}-error-%d{yyyy-MM-dd}-%i.log.gz">
+            <immediateFlush>false</immediateFlush>
+            <bufferSize>262144</bufferSize>
+
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+                <SizeBasedTriggeringPolicy size="1 GB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="50"/>
+
+            <!-- 🔥 关键过滤器：只接受 ERROR 及以上级别 -->
+            <Filters>
+                <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </RollingRandomAccessFile>
+
+    </Appenders>
+
+    <Loggers>
+        <!-- 开发环境通常想看 Spring 启动的详细流程，可以改为 INFO -->
+        <Logger name="org.springframework" level="INFO"/>
+        <Logger name="org.mybatis" level="INFO"/>
+
+        <!-- 开启 MBG 的详细日志 -->
+        <Logger name="org.mybatis.generator" level="DEBUG" />
+
+        <!-- 🔥 关键配置：将 Mapper 包的级别设为 DEBUG -->
+        <!-- additivity="false" 表示不重复打印到 Root，但需指定 AppenderRef -->
+        <!-- 如果你想省事，可以直接去掉 additivity 和 AppenderRef，让它继承 Root -->
+        <Logger name="thriving.softwood.dao.mapper" level="DEBUG" additivity="false">
+            <!-- 开发环境引用 Console，生产环境引用 AsyncFile -->
+            <AppenderRef ref="Console"/>
+            <!-- 如果想在文件里也看 SQL，把 InfoFile 也加上 -->
+            <!--<AppenderRef ref="InfoFile"/>-->
+        </Logger>
+
+        <!--
+            Root Logger
+            includeLocation="false": 依然建议关闭行号，否则文件写入性能会受影响。
+            如果你开发时实在想看行号，可以在上面的 CONSOLE_PATTERN 里加上 %L
+        -->
+        <Root level="INFO" includeLocation="false">
+            <!--指定当前级别日志输出到哪个追加器重-->
+            <!-- ✅ [新增] 引用控制台 -->
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="InfoFile"/>
+            <AppenderRef ref="ErrorFile"/>
+        </Root>
+    </Loggers>
+
+</Configuration>
