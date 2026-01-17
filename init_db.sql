@@ -21,7 +21,12 @@ SET @@SESSION.SQL_LOG_BIN = 0;
 -- GTID state at the beginning of the backup
 --
 
-SET @@GLOBAL.GTID_PURGED = /*!80000 '+'*/ '672819d0-d25b-11f0-b7a3-6aa2b2abc8f5:1-228';
+# SET @@GLOBAL.GTID_PURGED = /*!80000 '+'*/ '672819d0-d25b-11f0-b7a3-6aa2b2abc8f5:1-232';
+
+
+CREATE DATABASE /*!32312 IF NOT EXISTS */`movie` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
+
+USE `movie`;
 
 --
 -- Table structure for table `cinema`
@@ -32,9 +37,11 @@ DROP TABLE IF EXISTS `cinema`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cinema`
 (
-    `id`             bigint       NOT NULL AUTO_INCREMENT COMMENT '影院编号',
-    `cinema_name`    varchar(40)  NOT NULL COMMENT '影院名称',
-    `cinema_address` varchar(120) NOT NULL COMMENT '影院地址',
+    `id`             bigint                              NOT NULL AUTO_INCREMENT COMMENT '影院编号',
+    `cinema_name`    varchar(40)                         NOT NULL COMMENT '影院名称',
+    `cinema_address` varchar(120)                        NOT NULL COMMENT '影院地址',
+    `create_time`    timestamp default CURRENT_TIMESTAMP not null,
+    `update_time`    timestamp default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 19
@@ -50,7 +57,7 @@ CREATE TABLE `cinema`
 LOCK TABLES `cinema` WRITE;
 /*!40000 ALTER TABLE `cinema`
     DISABLE KEYS */;
-INSERT INTO `cinema`
+INSERT INTO `cinema` (id, cinema_name, cinema_address)
 VALUES (1, '中山奇幻电影院', '石岐区岐头新村龙凤街4号大信溢彩荟二期8楼'),
        (2, '金逸影城中山石歧店', '石岐区大信南路2路大信新都汇5楼'),
        (3, '博纳国际影城（中山IMAX店）', '古镇区同兴路98号利和广场购物中心四楼4009号'),
@@ -82,11 +89,13 @@ DROP TABLE IF EXISTS `comment`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `comment`
 (
-    `id`              bigint       NOT NULL AUTO_INCREMENT COMMENT '评论编号',
-    `user_id`         bigint       NOT NULL COMMENT '所属用户编号',
-    `comment_content` varchar(150) NOT NULL COMMENT '评论内容',
-    `movie_id`        bigint       NOT NULL COMMENT '所属电影编号',
-    `comment_time`    datetime     NOT NULL COMMENT '评论时间',
+    `id`              bigint                              NOT NULL AUTO_INCREMENT COMMENT '评论编号',
+    `user_id`         bigint                              NOT NULL COMMENT '所属用户编号',
+    `comment_content` varchar(150)                        NOT NULL COMMENT '评论内容',
+    `movie_id`        bigint                              NOT NULL COMMENT '所属电影编号',
+    `comment_time`    datetime                            NOT NULL COMMENT '评论时间',
+    `create_time`     timestamp default CURRENT_TIMESTAMP not null,
+    `update_time`     timestamp default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 58
@@ -102,7 +111,7 @@ CREATE TABLE `comment`
 LOCK TABLES `comment` WRITE;
 /*!40000 ALTER TABLE `comment`
     DISABLE KEYS */;
-INSERT INTO `comment`
+INSERT INTO `comment` (id, user_id, comment_content, movie_id, comment_time)
 VALUES (3, 1, '不容错过', 3, '2019-07-18 15:15:22'),
        (4, 1, '车开电车侧壁如履平地，足踢卫星返回舱一脚拯救东京，我看柯南跟吴京此生必有一战吧', 4, '2019-07-13 11:15:01'),
        (5, 1,
@@ -207,10 +216,12 @@ DROP TABLE IF EXISTS `hall`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `hall`
 (
-    `id`            bigint      NOT NULL AUTO_INCREMENT COMMENT '放映厅编号',
-    `hall_name`     varchar(20) NOT NULL COMMENT '放映厅名称',
-    `hall_capacity` int         NOT NULL DEFAULT '144' COMMENT '放映厅容量 默认为144  12 x 12 ',
-    `cinema_id`     bigint      NOT NULL COMMENT '所属影院编号',
+    `id`            bigint                              NOT NULL AUTO_INCREMENT COMMENT '放映厅编号',
+    `hall_name`     varchar(20)                         NOT NULL COMMENT '放映厅名称',
+    `hall_capacity` int                                 NOT NULL DEFAULT '144' COMMENT '放映厅容量 默认为144  12 x 12 ',
+    `cinema_id`     bigint                              NOT NULL COMMENT '所属影院编号',
+    `create_time`   timestamp default CURRENT_TIMESTAMP not null,
+    `update_time`   timestamp default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 52
@@ -226,7 +237,7 @@ CREATE TABLE `hall`
 LOCK TABLES `hall` WRITE;
 /*!40000 ALTER TABLE `hall`
     DISABLE KEYS */;
-INSERT INTO `hall`
+INSERT INTO `hall` (id, hall_name, hall_capacity, cinema_id)
 VALUES (1, '1号厅', 144, 1),
        (2, '1号厅', 144, 2),
        (3, '1号厅', 144, 3),
@@ -291,21 +302,23 @@ DROP TABLE IF EXISTS `movie`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `movie`
 (
-    `id`                 bigint       NOT NULL AUTO_INCREMENT COMMENT '电影编号',
-    `movie_cn_name`      varchar(30)           DEFAULT NULL COMMENT '电影名称（中文）',
-    `movie_fg_name`      varchar(50)           DEFAULT NULL COMMENT '电影名称（外语）',
-    `movie_actor`        varchar(100) NOT NULL COMMENT '电影演职人员',
-    `movie_director`     varchar(20)  NOT NULL COMMENT '电影导演',
-    `movie_detail`       varchar(350) NOT NULL COMMENT '电影详情',
-    `movie_duration`     varchar(20)  NOT NULL COMMENT '电影时长',
-    `movie_type`         varchar(20)  NOT NULL COMMENT '电影类型',
-    `movie_score`        float(10, 1)          DEFAULT '0.0' COMMENT '电影评分 默认为0',
-    `movie_boxOffice`    float(10, 4)          DEFAULT '0.0000' COMMENT '电影票房 默认为0',
-    `movie_commentCount` bigint                DEFAULT '0' COMMENT '电影参评人数 默认为0',
-    `movie_releaseDate`  date         NOT NULL COMMENT '电影上映时间',
-    `movie_country`      varchar(20)  NOT NULL COMMENT '电影制片地区',
-    `movie_picture`      varchar(100) NOT NULL COMMENT '电影海报',
-    `movie_state`        int          NOT NULL DEFAULT '1' COMMENT '电影状态 默认为1  1：在线 0：下架',
+    `id`                  bigint                                 NOT NULL AUTO_INCREMENT COMMENT '电影编号',
+    `movie_cn_name`       varchar(30)  DEFAULT NULL COMMENT '电影名称（中文）',
+    `movie_fg_name`       varchar(50)  DEFAULT NULL COMMENT '电影名称（外语）',
+    `movie_actor`         varchar(100)                           NOT NULL COMMENT '电影演职人员',
+    `movie_director`      varchar(20)                            NOT NULL COMMENT '电影导演',
+    `movie_detail`        varchar(350)                           NOT NULL COMMENT '电影详情',
+    `movie_duration`      varchar(20)                            NOT NULL COMMENT '电影时长',
+    `movie_type`          varchar(20)                            NOT NULL COMMENT '电影类型',
+    `movie_score`         float(10, 1) DEFAULT '0.0' COMMENT '电影评分 默认为0',
+    `movie_box_office`    float(10, 4) DEFAULT '0.0000' COMMENT '电影票房 默认为0',
+    `movie_comment_count` bigint       DEFAULT '0' COMMENT '电影参评人数 默认为0',
+    `movie_release_date`  date                                   NOT NULL COMMENT '电影上映时间',
+    `movie_country`       varchar(20)                            NOT NULL COMMENT '电影制片地区',
+    `movie_picture`       varchar(100)                           NOT NULL COMMENT '电影海报',
+    `movie_state`         int                                    NOT NULL DEFAULT '1' COMMENT '电影状态 默认为1 0：待上架 1：在线 2: 下架',
+    `create_time`         timestamp    default CURRENT_TIMESTAMP not null,
+    `update_time`         timestamp    default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 30
@@ -321,7 +334,9 @@ CREATE TABLE `movie`
 LOCK TABLES `movie` WRITE;
 /*!40000 ALTER TABLE `movie`
     DISABLE KEYS */;
-INSERT INTO `movie`
+INSERT INTO `movie` (id, movie_cn_name, movie_fg_name, movie_actor, movie_director, movie_detail, movie_duration,
+                     movie_type, movie_score, movie_box_office, movie_comment_count, movie_release_date, movie_country,
+                     movie_picture, movie_state)
 VALUES (1, '毒液：致命守护者', 'Venom', '汤姆·哈迪:埃迪·布洛克/毒液,米歇尔·威廉姆斯:安妮·韦英', '鲁本·弗雷斯彻',
         '身为记者的埃迪·布洛克（汤姆·哈迪饰）在调查生命基金会老板卡尔顿·德雷克（里兹·阿迈德饰）的过程中，事业遭受重创，与未婚妻安妮·韦英（米歇尔·威廉姆斯饰）的关系岌岌可危，并意外被外星共生体控制，他历经挣扎对抗，最终成为拥有强大超能力，无人可挡的“毒液“',
         '107分钟', '动作，科幻', 7.2, 1.0209, 7, '2019-06-24', '美国',
@@ -418,13 +433,15 @@ DROP TABLE IF EXISTS `order`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `order`
 (
-    `id`             bigint      NOT NULL AUTO_INCREMENT COMMENT '订单编号',
-    `user_id`        bigint      NOT NULL COMMENT '所属用户编号',
-    `schedule_id`    bigint      NOT NULL COMMENT '所属场次编号',
-    `order_position` varchar(20) NOT NULL COMMENT '电影票座位 （x排x座）',
-    `order_state`    int         NOT NULL DEFAULT '1' COMMENT '订单状态 0:退票中 1:已支付 2:退票成功',
-    `order_price`    int         NOT NULL COMMENT '订单价格',
-    `order_time`     datetime    NOT NULL COMMENT '订单支付时间',
+    `id`             bigint                              NOT NULL AUTO_INCREMENT COMMENT '订单编号',
+    `user_id`        bigint                              NOT NULL COMMENT '所属用户编号',
+    `schedule_id`    bigint                              NOT NULL COMMENT '所属场次编号',
+    `order_position` varchar(20)                         NOT NULL COMMENT '电影票座位 （x排x座）',
+    `order_state`    int                                 NOT NULL DEFAULT '1' COMMENT '订单状态 0:退票中 1:已支付 2:退票成功',
+    `order_price`    int                                 NOT NULL COMMENT '订单价格',
+    `order_time`     datetime                            NOT NULL COMMENT '订单支付时间',
+    `create_time`    timestamp default CURRENT_TIMESTAMP not null,
+    `update_time`    timestamp default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 2021082000290311
@@ -440,7 +457,7 @@ CREATE TABLE `order`
 LOCK TABLES `order` WRITE;
 /*!40000 ALTER TABLE `order`
     DISABLE KEYS */;
-INSERT INTO `order`
+INSERT INTO `order` (id, user_id, schedule_id, order_position, order_state, order_price, order_time)
 VALUES (2019072100030210, 3, 25, '2排10座', 1, 38, '2019-07-21 07:01:36'),
        (2019072100030306, 3, 310, '3排6座', 1, 40, '2019-07-21 14:44:34'),
        (2019072100030307, 3, 26, '3排7座', 0, 40, '2019-07-21 07:07:09'),
@@ -507,13 +524,15 @@ DROP TABLE IF EXISTS `schedule`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `schedule`
 (
-    `id`                 bigint      NOT NULL AUTO_INCREMENT COMMENT '场次编号',
-    `hall_id`            bigint      NOT NULL COMMENT '所属放映厅编号',
-    `movie_id`           bigint      NOT NULL COMMENT '所属电影编号',
-    `schedule_startTime` varchar(20) NOT NULL COMMENT '电影放映时间',
-    `schedule_price`     int         NOT NULL COMMENT '场次价格',
-    `schedule_remain`    int         NOT NULL COMMENT '剩余座位数 默认=hall_capacity',
-    `schedule_state`     int         NOT NULL DEFAULT '1' COMMENT '场次状态 默认1 1：上映中 0：下架',
+    `id`                  bigint                              NOT NULL AUTO_INCREMENT COMMENT '场次编号',
+    `hall_id`             bigint                              NOT NULL COMMENT '所属放映厅编号',
+    `movie_id`            bigint                              NOT NULL COMMENT '所属电影编号',
+    `schedule_start_time` varchar(20)                         NOT NULL COMMENT '电影放映时间',
+    `schedule_price`      int                                 NOT NULL COMMENT '场次价格',
+    `schedule_remain`     int                                 NOT NULL COMMENT '剩余座位数 默认=hall_capacity',
+    `schedule_state`      int                                 NOT NULL DEFAULT '1' COMMENT '场次状态 默认1 1：上映中 0：下架',
+    `create_time`         timestamp default CURRENT_TIMESTAMP not null,
+    `update_time`         timestamp default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 316
@@ -529,7 +548,7 @@ CREATE TABLE `schedule`
 LOCK TABLES `schedule` WRITE;
 /*!40000 ALTER TABLE `schedule`
     DISABLE KEYS */;
-INSERT INTO `schedule`
+INSERT INTO `schedule` (id, hall_id, movie_id, schedule_start_time, schedule_price, schedule_remain, schedule_state)
 VALUES (25, 1, 25, '2019-07-21 17:30', 38, 144, 1),
        (26, 7, 25, '2019-07-22 20:00', 40, 143, 1),
        (27, 7, 1, '2019-07-21 19:10', 55, 141, 0),
@@ -834,12 +853,14 @@ DROP TABLE IF EXISTS `user`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `user`
 (
-    `id`           bigint      NOT NULL AUTO_INCREMENT COMMENT '会员编号',
-    `user_name`    varchar(20) NOT NULL COMMENT '会员账号',
-    `user_pwd`     varchar(20) NOT NULL COMMENT '会员密码',
-    `user_email`   varchar(30) NOT NULL COMMENT '会员邮箱',
-    `user_role`    int         NOT NULL DEFAULT '0' COMMENT '会员权限（默认为0）\r\n0：普通会员 1：管理员',
-    `user_headImg` varchar(100)         DEFAULT NULL COMMENT '会员头像',
+    `id`           bigint                                 NOT NULL AUTO_INCREMENT COMMENT '会员编号',
+    `user_name`    varchar(20)                            NOT NULL COMMENT '会员账号',
+    `user_pwd`     varchar(20)                            NOT NULL COMMENT '会员密码',
+    `user_email`   varchar(30)                            NOT NULL COMMENT '会员邮箱',
+    `user_role`    int                                    NOT NULL DEFAULT '0' COMMENT '会员权限（默认为0）\r\n0：普通会员 1：管理员',
+    `user_headImg` varchar(100) DEFAULT NULL COMMENT '会员头像',
+    `create_time`  timestamp    default CURRENT_TIMESTAMP not null,
+    `update_time`  timestamp    default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 31
@@ -855,7 +876,7 @@ CREATE TABLE `user`
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user`
     DISABLE KEYS */;
-INSERT INTO `user`
+INSERT INTO `user` (id, user_name, user_pwd, user_email, user_role, user_headImg)
 VALUES (1, 'user', 'user', '33734872621@qq.com', 0, 'upload/head/f6337987771546f9a143fc5206f047f4.jpg'),
        (2, 'admin', 'admin', '3456872621@qq.com', 1, 'upload/head/dc56255b1e4f4ad4b0a76a8eb0fc7f45.jpg'),
        (3, 'wxj', 'wxj', '937872111@126.com', 1, 'upload/head/de9d930c96e240bc9f4f91b914e5dddb.jpg'),
@@ -895,4 +916,4 @@ SET @@SESSION.SQL_LOG_BIN = @MYSQLDUMP_TEMP_LOG_BIN;
 /*!40101 SET COLLATION_CONNECTION = @OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES = @OLD_SQL_NOTES */;
 
--- Dump completed on 2026-01-14 11:03:07
+-- Dump completed on 2026-01-15  9:57:51

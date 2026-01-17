@@ -8,7 +8,9 @@
             %style{%c{1.}}{cyan}: 类名用青色显示
             %t: 线程名
         -->
-        <Property name="CONSOLE_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %highlight{%-5level} %style{%c{1.}}{cyan} - %msg%n</Property>
+        <Property name="CONSOLE_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %highlight{%-5level} %style{%c{1.}}{cyan} -
+            %msg%n
+        </Property>
 
         <!-- 生产环境文件格式 (无颜色字符，纯文本) -->
         <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %c{1.} - %msg%n</Property>
@@ -91,15 +93,15 @@
     <Loggers>
         <!-- 开发环境通常想看 Spring 启动的详细流程，可以改为 INFO -->
         <Logger name="org.springframework" level="INFO"/>
-        <Logger name="org.mybatis" level="INFO"/>
+        <Logger name="org.mybatis" level="DEBUG"/>
 
         <!-- 开启 MBG 的详细日志 -->
-        <Logger name="org.mybatis.generator" level="DEBUG" />
+        <Logger name="org.mybatis.generator" level="DEBUG"/>
 
         <!-- 🔥 关键配置：将 Mapper 包的级别设为 DEBUG -->
         <!-- additivity="false" 表示不重复打印到 Root，但需指定 AppenderRef -->
         <!-- 如果你想省事，可以直接去掉 additivity 和 AppenderRef，让它继承 Root -->
-        <Logger name="thriving.softwood.dao.mapper" level="DEBUG" additivity="false">
+        <Logger name="thriving.softwood.mapper" level="DEBUG" additivity="false">
             <!-- 开发环境引用 Console，生产环境引用 AsyncFile -->
             <AppenderRef ref="Console"/>
             <!-- 如果想在文件里也看 SQL，把 InfoFile 也加上 -->

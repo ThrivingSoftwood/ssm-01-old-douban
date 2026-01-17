@@ -50,13 +50,13 @@ public class LombokPlugin extends PluginAdapter {
     private void addLombokAnnotations(TopLevelClass topLevelClass) {
         // 添加 import
         topLevelClass.addImportedType("lombok.Data");
-        topLevelClass.addImportedType("lombok.Builder");
+        // topLevelClass.addImportedType("lombok.Builder");
         topLevelClass.addImportedType("lombok.NoArgsConstructor");
         topLevelClass.addImportedType("lombok.AllArgsConstructor");
 
         // 添加注解
         topLevelClass.addAnnotation("@Data");
-        topLevelClass.addAnnotation("@Builder");
+        // topLevelClass.addAnnotation("@Builder");
         topLevelClass.addAnnotation("@NoArgsConstructor");
         topLevelClass.addAnnotation("@AllArgsConstructor");
     }

@@ -54,6 +54,7 @@
             <tx:method name="qry*" read-only="true" propagation="SUPPORTS"/>
             <tx:method name="query*" read-only="true" propagation="SUPPORTS"/>
             <tx:method name="list*" read-only="true" propagation="SUPPORTS"/>
+            <tx:method name="load*" read-only="true" propagation="SUPPORTS"/>
         </tx:attributes>
     </tx:advice>
     <aop:config>
@@ -70,10 +71,10 @@
         <property name="dataSource" ref="dataSource"/>
         <!--指定 mybatis 配置文件位置-->
         <property name="configLocation" value="classpath:configuration/mybatis/mybatis.xml"/>
-        <property name="mapperLocations" value="classpath:thriving/softwood/dao/mapper/**/*.xml"/>
+        <property name="mapperLocations" value="classpath:thriving/softwood/mapper/**/*.xml"/>
     </bean>
     <!--将 Mapper.java 映射器接口托管给 SqlSessionFactory-->
-    <mybatis:scan base-package="thriving.softwood.dao.mapper"/>
+    <mybatis:scan base-package="thriving.softwood.mapper"/>
     <!--配置 sqlSessionFactory begin-->
 
 </beans>
