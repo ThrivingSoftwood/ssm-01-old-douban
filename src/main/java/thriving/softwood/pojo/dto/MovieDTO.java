@@ -1,8 +1,7 @@
-package thriving.softwood.pojo.vo;
+package thriving.softwood.pojo.dto;
 
 import java.io.Serial;
-import java.io.Serializable;
-import java.util.List;
+import java.util.Map;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,11 +12,12 @@ import thriving.softwood.pojo.entity.Movie;
  */
 @Data
 @NoArgsConstructor
-public class MovieListVO implements Serializable {
+public class MovieDTO extends Movie {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    List<Movie> movies;
-
-    Long count;
+    Float minScore;
+    String movieReleaseYear;
+    String sortType;
+    Map<String, String> orderByClause;
 }

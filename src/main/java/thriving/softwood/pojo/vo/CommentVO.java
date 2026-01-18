@@ -1,12 +1,13 @@
-package thriving.softwood.pojo.dto;
+package thriving.softwood.pojo.vo;
 
 import java.io.Serial;
-import java.util.Map;
+import java.io.Serializable;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import thriving.softwood.pojo.entity.Movie;
+import thriving.softwood.pojo.entity.Comment;
+import thriving.softwood.pojo.entity.User;
 
 /**
  * @author ThrivingSoftwood
@@ -14,9 +15,9 @@ import thriving.softwood.pojo.entity.Movie;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MovieQryDTO extends Movie {
+public class CommentVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-
-    Map<String, Boolean> orderByClause;
+    Comment comment;
+    User commentUser;
 }

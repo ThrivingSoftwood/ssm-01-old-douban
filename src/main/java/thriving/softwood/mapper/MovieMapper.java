@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
-import thriving.softwood.pojo.dto.MovieQryDTO;
+import thriving.softwood.pojo.dto.MovieDTO;
 import thriving.softwood.pojo.entity.Movie;
 
 /**
@@ -15,7 +15,9 @@ public interface MovieMapper {
 
     // 手写方法 begin
 
-    List<Movie> list(MovieQryDTO dto);
+    Movie get(MovieDTO dto);
+
+    List<Movie> list(MovieDTO dto);
 
     // 手写方法 end
 

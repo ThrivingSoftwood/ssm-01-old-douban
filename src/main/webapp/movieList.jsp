@@ -36,9 +36,9 @@
 <!-- 副导航栏 -->
 <ul class="layui-nav fu-nav">
     <div id="yui"></div>
-    <li class="layui-nav-item layui-this"><a>正在热映</a></li>
-    <li class="layui-nav-item"><a>即将上映</a></li>
-    <li class="layui-nav-item"><a>经典影片</a></li>
+    <li class="layui-nav-item" data-value="outNow"><a>正在热映</a></li>
+    <li class="layui-nav-item" data-value="upcoming"><a>即将上映</a></li>
+    <li class="layui-nav-item" data-value="classicFilms"><a>经典影片</a></li>
 </ul>
 
 <!-- 主体 -->
@@ -106,6 +106,8 @@
 
 <!-- ------------------------------------------------------------------- -->
 <script>
+    let movieState;
+    let classicFilmScore;
     var clientHeight = document.documentElement.clientHeight;
     var clientWidth = document.documentElement.clientWidth;
     var date;
@@ -117,6 +119,7 @@
         funav(); //副导航栏
         initHeader();
         initParams(); //参数
+        fixNav();
         initTags(); //标签
         initMovieList(); //电影列表
         initClass(); //布局
@@ -131,58 +134,59 @@
 
     //初始化电影列表
     function initMovieList() {
-        if (getUrlParams("type") == "全部" || getUrlParams("type") == null) {
-            $.ajax({
-                type: "post",
-                url: url + "/movie/loadMovieList",
-                data: {sortType: sortType},
-                dataType: "json",
-                success: function (obj) {
-                    console.log(obj);
-                    for (var i = 0; i < obj.data.count; i++) {
-                        movielist.append(
-                            "<li> <div class=\"movie-item\"> <a href=\"./buyTickets.jsp?movie_id=" + obj.data.movies[i].movieId + "\" target=\"_blank\"> <div class=\"movie-poster\"> <img src=\"" + obj.data.movies[i].moviePicture + "\"> </div> </a>" +
-                            "<div class=\"channel-action channel-action-sale\"> <a>购票<a/> </div> <div class=\"movie-ver\"></div> </div>" +
-                            "<div class=\"channel-detail movie-item-title\" title=\"" + obj.data.movies[i].movieCnName + "\">" +
-                            "<a href=\"./movieDetail.jsp?movie_id=" + obj.data.movies[i].movieId + "\" target=\"_blank\">" + obj.data.movies[i].movieCnName + "</a> </div>" +
-                            "<div class=\"channel-detail channel-detail-orange\"> <i class=\"integer\">" + obj.data.movies[i].movieScore + "</i> </div>" +
-                            "</li>"
-                        );
-                    }
-                },
-                error: function () {
-                    alert("network error!");
+        let movieType = getUrlParams("type");
+        let movieCountry = getUrlParams("area");
+        let movieReleaseYear = getUrlParams("year");
+        let queryState = getUrlParams("movieState");
+        let minScore = getUrlParams("classicFilmScore");
+        let dto = {
+            movieState: (undefined == queryState || null == queryState) ? 1 : queryState,
+            minScore: (undefined == minScore || null == minScore) ? -15 : minScore,
+            movieType: (0 == movieType || '全部' == movieType ? null : movieType),
+            movieCountry: (0 == movieCountry || '全部' == movieCountry ? null : movieCountry),
+            movieReleaseYear: (0 == movieReleaseYear || '全部' == movieReleaseYear ? null : movieReleaseYear),
+            sortType: (0 == sortType || '全部' == sortType ? null : sortType)
+        };
+        // alert("movieType" + movieType + "\nmovieCountry: " + movieCountry + "\nmovieReleaseYear:" + movieReleaseYear + "\nmovieReleaseYear:" + movieReleaseYear + "\ndata:" + JSON.stringify(dto));
+
+        $.ajax({
+            type: "post",
+            url: url + "/movie/loadMovieList",
+            data: dto,
+            dataType: "json",
+            success: function (obj) {
+                console.log(obj);
+                for (var i = 0; i < obj.data.count; i++) {
+                    movielist.append(`
+                            <li>
+                                <div class="movie-item">
+                                    <a href="./buyTickets.jsp?movieId=\${obj.data.movies[i].id}" target="_blank">
+                                        <div class="movie-poster">
+                                            <img src="\${obj.data.movies[i].moviePicture}">
+                                        </div>
+                                    </a>
+                                    <div class="channel-action channel-action-sale">
+                                        <a>购票</a>
+                                    </div>
+                                    <div class="movie-ver"></div>
+                                </div>
+                                <div class="channel-detail movie-item-title" title="\${obj.data.movies[i].movieCnName}">
+                                    <a href="./movieDetail.jsp?movieId=\${obj.data.movies[i].id}" target="_blank">
+                                        \${obj.data.movies[i].movieCnName}
+                                    </a>
+                                </div>
+                                <div class="channel-detail channel-detail-orange">
+                                    <i class="integer">\${obj.data.movies[i].movieScore}</i>
+                                </div>
+                            </li>
+                        `);
                 }
-            });
-        } else {
-            $.ajax({
-                type: "post",
-                url: url + "/movie/findMoviesByType",
-                data: {type: type},
-                dataType: "json",
-                success: function (obj) {
-                    console.log(obj);
-                    if (obj.data.count > 0) {
-                        for (var i = 0; i < obj.data.count; i++) {
-                            movielist.append(
-                                "<li> <div class=\"movie-item\"> <a href=\"./buyTickets.jsp?movie_id=" + obj.data.movies[i].movieId + "\" target=\"_blank\"> <div class=\"movie-poster\"> <img src=\"" + obj.data.movies[i].moviePicture + "\"> </div> </a>" +
-                                "<div class=\"channel-action channel-action-sale\"> <a>购票<a/> </div> <div class=\"movie-ver\"></div> </div>" +
-                                "<div class=\"channel-detail movie-item-title\" title=\"" + obj.data.movies[i].movieCnName + "\">" +
-                                "<a href=\"./movieDetail.jsp?movie_id=" + obj.data.movies[i].movieId + "\" target=\"_blank\">" + obj.data.movies[i].movieCnName + "</a> </div>" +
-                                "<div class=\"channel-detail channel-detail-orange\"> <i class=\"integer\">" + obj.data.movies[i].movieScore + "</i> </div>" +
-                                "</li>"
-                            );
-                        }
-                    } else {
-                        //movielist.append("<div style=\"height:320px\"><p style=\"text-align:center;padding:100px 0; font-size:24px;\">查无数据...</p></div>");
-                        movielist.append("<div style=\"margin-top:40px;font-size:18px;color:#333;height:190px;\">抱歉，没有找到相关结果，请尝试用其他条件筛选。</div>");
-                    }
-                },
-                error: function () {
-                    alert("network error!");
-                }
-            })
-        }
+            },
+            error: function () {
+                alert("network error!");
+            }
+        });
+
         var radio = $('.sort-control-group');
         for (var i = 0; i < radio.length; i++) {
             // var zz = radio[i].children[0];
@@ -213,7 +217,7 @@
                 $.ajax({
                     type: "post",
                     url: url + "/movie/loadMovieList",
-                    data: {sortType: sortType},
+                    data: dto,
                     dataType: "json",
                     success: function (obj) {
                         console.log(obj);
@@ -221,14 +225,29 @@
                         movieslist.append("<ul class=\"movie-list\"></ul>");
                         var movielist = $('.movie-list');
                         for (var i = 0; i < obj.data.count; i++) {
-                            movielist.append(
-                                "<li> <div class=\"movie-item\"> <a href=\"./buyTickets.jsp?movie_id=" + obj.data.movies[i].movieId + "\" target=\"_blank\"> <div class=\"movie-poster\"> <img src=\"" + obj.data.movies[i].moviePicture + "\"> </div> </a>" +
-                                "<div class=\"channel-action channel-action-sale\"> <a>购票<a/> </div> <div class=\"movie-ver\"></div> </div>" +
-                                "<div class=\"channel-detail movie-item-title\" title=\"" + obj.data.movies[i].movieCnName + "\">" +
-                                "<a href=\"./movieDetail.jsp?movie_id=" + obj.data.movies[i].movieId + "\" target=\"_blank\">" + obj.data.movies[i].movieCnName + "</a> </div>" +
-                                "<div class=\"channel-detail channel-detail-orange\"> <i class=\"integer\">" + obj.data.movies[i].movieScore + "</i> </div>" +
-                                "</li>"
-                            );
+                            movielist.append(`
+                            <li>
+                                <div class="movie-item">
+                                    <a href="./buyTickets.jsp?movieId=\${obj.data.movies[i].id}" target="_blank">
+                                        <div class="movie-poster">
+                                            <img src="\${obj.data.movies[i].moviePicture}">
+                                        </div>
+                                    </a>
+                                    <div class="channel-action channel-action-sale">
+                                        <a>购票</a>
+                                    </div>
+                                    <div class="movie-ver"></div>
+                                </div>
+                                <div class="channel-detail movie-item-title" title="\${obj.data.movies[i].movieCnName}">
+                                    <a href="./movieDetail.jsp?movieId=\${obj.data.movies[i].id}" target="_blank">
+                                        \${obj.data.movies[i].movieCnName}
+                                    </a>
+                                </div>
+                                <div class="channel-detail channel-detail-orange">
+                                    <i class="integer">\${obj.data.movies[i].movieScore}</i>
+                                </div>
+                            </li>
+                        `);
                         }
                     },
                     error: function () {
@@ -239,20 +258,55 @@
         }
     }
 
+    function fixNav() {
+        let $navigator = $(".fu-nav").find("li");
+        $navigator.removeClass("layui-this");
+        if (0 == movieState) {
+            $navigator.filter("[data-value='upcoming']").addClass("layui-this");
+        } else if (1 == movieState && 8.5 <= classicFilmScore) {
+            $navigator.filter("[data-value='classicFilms']").addClass("layui-this");
+        } else {
+            $navigator.filter("[data-value='outNow']").addClass("layui-this");
+        }
+    }
+
     //副导航栏响应
     function funav() {
         layui.use('element', function () {
             var element = layui.element;
 
             //监听导航点击
-            element.on('nav(demo)', function (elem) {
-                layer.msg(elem.text());
-            });
+            element.render('nav')
         });
-        var navitems = $(".fu-nav").find("li").children("a");
+        let navitems = $(".fu-nav").find("li").children("a");
         for (i = 0; i < navitems.length; i++) {
             navitems[i].onclick = function () {
                 //按钮
+                let value = $(this).parent().data("value");
+                switch (value) {
+                    case 'outNow':
+                        movieState = 1;
+                        classicFilmScore = -15;
+                        break;
+                    case "upcoming":
+                        movieState = 0;
+                        classicFilmScore = -15;
+                        break;
+                    case "classicFilms":
+                        movieState = 1;
+                        classicFilmScore = 8.5;
+                        break;
+                    default:
+                        movieState = 1;
+                        classicFilmScore = -15;
+                        break;
+                }
+                const currentUrlObj = new URL(window.location.href);
+                // 更新或添加参数
+                currentUrlObj.searchParams.set('movieState', movieState);
+                currentUrlObj.searchParams.set('classicFilmScore', classicFilmScore);
+                // 跳转
+                window.location.href = currentUrlObj.toString();
             }
         }
     }
@@ -268,7 +322,7 @@
         var TypeActive = [],
             AreaActive = [],
             YearActive = [];
-        var urlTemp = ["&type=" + type, "&area=" + area, "&year=" + year];
+        var urlTemp = ["&type=" + type, "&area=" + area, "&year=" + year, "&movieState=" + movieState, "&classicFilmScore=" + classicFilmScore];
         TypeActive = inputTags(TypeStr, TypeActive, type);
         AreaActive = inputTags(AreaStr, AreaActive, area);
         YearActive = inputTags(YearStr, YearActive, year);
@@ -276,29 +330,29 @@
             urlTemp[0] = "&type=" + TypeStr[i];
             tagsType.append(
                 "<li " + TypeActive[i] + ">" +
-                "<a href=\"?" + urlTemp[0] + urlTemp[1] + urlTemp[2] + "\">" +
+                "<a href=\"?" + urlTemp[0] + urlTemp[1] + urlTemp[2] + urlTemp[3] + urlTemp[4] + "\">" +
                 TypeStr[i] +
                 "</a>" +
                 "</li>"
             );
         }
-        urlTemp = ["&type=" + type, "&area=" + area, "&year=" + year];
+        urlTemp = ["&type=" + type, "&area=" + area, "&year=" + year, "&movieState=" + movieState, "&classicFilmScore=" + classicFilmScore];
         for (var i = 0; i < AreaStr.length; i++) {
             urlTemp[1] = "&area=" + AreaStr[i];
             tagsArea.append(
                 "<li " + AreaActive[i] + ">" +
-                "<a href=\"?" + urlTemp[0] + urlTemp[1] + urlTemp[2] + "\">" +
+                "<a href=\"?" + urlTemp[0] + urlTemp[1] + urlTemp[2] + urlTemp[3] + urlTemp[4] + "\">" +
                 AreaStr[i] +
                 "</a>" +
                 "</li>"
             );
         }
-        urlTemp = ["&type=" + type, "&area=" + area, "&year=" + year];
+        urlTemp = ["&type=" + type, "&area=" + area, "&year=" + year, "&movieState=" + movieState, "&classicFilmScore=" + classicFilmScore];
         for (var i = 0; i < YearStr.length; i++) {
             urlTemp[2] = "&year=" + YearStr[i];
             tagsYear.append(
                 "<li " + YearActive[i] + ">" +
-                "<a href=\"?" + urlTemp[0] + urlTemp[1] + urlTemp[2] + "\">" +
+                "<a href=\"?" + urlTemp[0] + urlTemp[1] + urlTemp[2] + urlTemp[3] + urlTemp[4] + "\">" +
                 YearStr[i] +
                 "</a>" +
                 "</li>"
@@ -337,6 +391,16 @@
             year = "0";
         } else {
             year = getUrlParams('year');
+        }
+        if (getUrlParams('movieState') == null) {
+            movieState = 1;
+        } else {
+            movieState = getUrlParams('movieState');
+        }
+        if (getUrlParams('classicFilmScore') == null) {
+            classicFilmScore = -15;
+        } else {
+            classicFilmScore = getUrlParams('classicFilmScore');
         }
     }
 

@@ -61,7 +61,11 @@ public enum RespCodeEnum {
     VARIANT_ALSO_NEGOTIATES(506, "Variant Also Negotiates", "RFC 2295"),
     INSUFFICIENT_STORAGE(507, "Insufficient Storage", "RFC 4918"), LOOP_DETECTED(508, "Loop Detected", ""),
     BANDWIDTH_LIMIT_EXCEEDED(509, "Bandwidth Limit Exceeded", ""), NOT_EXTENDED(510, "Not Extended", "RFC 2774"),
-    NETWORK_AUTHENTICATION_REQUIRED(511, "Network Authentication Required", "RFC 6585");
+    NETWORK_AUTHENTICATION_REQUIRED(511, "Network Authentication Required", "RFC 6585"),
+
+    /* 上方是官方定义的错误编码,下方是自定义的错误编码 */
+
+    LOGIN_INVALID_USER(100001, "User you tried to Login do not exist.", "尝试登录的用户不存在");
 
     private final Integer statusCode;
     private final String enDetail;

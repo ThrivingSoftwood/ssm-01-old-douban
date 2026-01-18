@@ -3,13 +3,16 @@ package thriving.softwood.pojo.entity;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * @author ThrivingSoftwood
+ */
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class Comment implements Serializable {
     /**
      *
@@ -58,6 +61,7 @@ public class Comment implements Serializable {
      *
      * @mbg.generated Thu Jan 15 18:52:49 CST 2026
      */
+    @JsonIgnore
     private LocalDateTime createTime;
 
     /**
@@ -66,6 +70,7 @@ public class Comment implements Serializable {
      *
      * @mbg.generated Thu Jan 15 18:52:49 CST 2026
      */
+    @JsonIgnore
     private LocalDateTime updateTime;
 
     /**
@@ -73,5 +78,6 @@ public class Comment implements Serializable {
      *
      * @mbg.generated Thu Jan 15 18:52:49 CST 2026
      */
+    @JsonIgnore
     private static final long serialVersionUID = 1L;
 }

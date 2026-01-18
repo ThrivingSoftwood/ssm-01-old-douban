@@ -43,7 +43,7 @@ public class Result<T> implements Serializable {
         // 建议后续用枚举替换硬编码
         result.setSuccess(true);
         result.setCode(OK.code());
-        result.setMsg(OK.cnDesc());
+        result.setMsg(OK.enDesc());
         result.setData(data);
         return result;
     }
@@ -69,11 +69,33 @@ public class Result<T> implements Serializable {
     /**
      * 失败响应
      */
-    public static <T> Result<T> error(Integer code, String msg, T data) {
+    public static <T> Result<T> error(Integer code, String msg, Throwable e) {
         Result<T> result = new Result<>();
         result.setSuccess(false);
         result.setCode(code);
-        result.setMsg(msg);
+        result.setMsg(msg + "\n" + e.getLocalizedMessage());
+        return result;
+    }
+
+    /**
+     * 失败响应
+     */
+    public static <T> Result<T> error(RespCodeEnum enumObj, Throwable e) {
+        Result<T> result = new Result<>();
+        result.setSuccess(false);
+        result.setCode(enumObj.code());
+        result.setMsg(enumObj.cnDesc() + "\n" + (null == e ? "" : ("\n" + e.getLocalizedMessage())));
+        return result;
+    }
+
+    /**
+     * 失败响应
+     */
+    public static <T> Result<T> error(RespCodeEnum enumObj, Throwable e, T data) {
+        Result<T> result = new Result<>();
+        result.setSuccess(false);
+        result.setCode(enumObj.code());
+        result.setMsg(enumObj.cnDesc() + "\n" + (null == e ? "" : ("\n" + e.getLocalizedMessage())));
         result.setData(data);
         return result;
     }
@@ -81,22 +103,11 @@ public class Result<T> implements Serializable {
     /**
      * 失败响应
      */
-    public static <T> Result<T> error(RespCodeEnum enumObj, String msg) {
+    public static <T> Result<T> error(RespCodeEnum enumObj, String msg, Throwable e, T data) {
         Result<T> result = new Result<>();
         result.setSuccess(false);
         result.setCode(enumObj.code());
-        result.setMsg(enumObj.cnDesc() + "\n" + msg);
-        return result;
-    }
-
-    /**
-     * 失败响应
-     */
-    public static <T> Result<T> error(RespCodeEnum enumObj, String msg, T data) {
-        Result<T> result = new Result<>();
-        result.setSuccess(false);
-        result.setCode(enumObj.code());
-        result.setMsg(enumObj.cnDesc() + "\n" + msg);
+        result.setMsg(enumObj.cnDesc() + "\n" + msg + (null == e ? "" : ("\n" + e.getLocalizedMessage())));
         result.setData(data);
         return result;
     }

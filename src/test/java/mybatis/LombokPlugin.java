@@ -52,13 +52,13 @@ public class LombokPlugin extends PluginAdapter {
         topLevelClass.addImportedType("lombok.Data");
         // topLevelClass.addImportedType("lombok.Builder");
         topLevelClass.addImportedType("lombok.NoArgsConstructor");
-        topLevelClass.addImportedType("lombok.AllArgsConstructor");
+        // topLevelClass.addImportedType("lombok.AllArgsConstructor");
 
         // 添加注解
         topLevelClass.addAnnotation("@Data");
         // topLevelClass.addAnnotation("@Builder");
         topLevelClass.addAnnotation("@NoArgsConstructor");
-        topLevelClass.addAnnotation("@AllArgsConstructor");
+        // topLevelClass.addAnnotation("@AllArgsConstructor");
     }
 
     // 👇 拦截 Getter 生成

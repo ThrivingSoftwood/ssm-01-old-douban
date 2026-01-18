@@ -4,7 +4,8 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,7 +14,6 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class Movie implements Serializable {
     /**
      *
@@ -148,6 +148,7 @@ public class Movie implements Serializable {
      *
      * @mbg.generated Thu Jan 15 18:52:49 CST 2026
      */
+    @JsonIgnore
     private LocalDateTime createTime;
 
     /**
@@ -156,6 +157,7 @@ public class Movie implements Serializable {
      *
      * @mbg.generated Thu Jan 15 18:52:49 CST 2026
      */
+    @JsonIgnore
     private LocalDateTime updateTime;
 
     /**
@@ -163,5 +165,6 @@ public class Movie implements Serializable {
      *
      * @mbg.generated Thu Jan 15 18:52:49 CST 2026
      */
+    @JsonIgnore
     private static final long serialVersionUID = 1L;
 }

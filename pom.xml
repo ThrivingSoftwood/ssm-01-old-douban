@@ -35,6 +35,7 @@
         <aspectjweaver.version>1.9.25.1</aspectjweaver.version>
         <mybatis.spring.version>4.0.0</mybatis.spring.version>
         <druid.version>1.2.27</druid.version>
+        <hutool.version>7.0.0-M4</hutool.version>
     </properties>
 
 
@@ -217,6 +218,12 @@
             <version>${spring.version}</version>
         </dependency>
         <!--spring-aop end-->
+        <!--工具类-->
+        <dependency>
+            <groupId>cn.hutool.v7</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>${hutool.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -1,113 +1,114 @@
 ﻿//验证用户身份
-function init_manage(){
+function init_manage() {
     var user_json = JSON.parse(localStorage.getItem("userJson"));
     var user_role = user_json.userRole;  //身份验证
     var nav = $(".nav").find("ul");
     var html;
-    if(user_json.userRole == 1){
+    if (user_json.userRole == 1) {
         html = "<li><a href=\"./manage.jsp\" onclick=\"managePage()\">管理</a></li>"
         nav.append(html);
     }
-    function managePage(){
-        localStorage.setItem("cardId",0);
+
+    function managePage() {
+        localStorage.setItem("cardId", 0);
     }
 }
 
 //验证用户身份
-function init_comment(){
+function init_comment() {
     var user = localStorage.getItem("userJson");
-    var commentListContainer = $(".comment-list-container").find("ul");   
-    if(user == null){
+    var commentListContainer = $(".comment-list-container").find("ul");
+    if (user == null) {
         $.ajax({
-            type:'post',
-            url: url + "/movie/findMovieById",
-            dataType:'json',
+            type: 'post',
+            url: url + "/movie/loadMovieDetail",
+            dataType: 'json',
             data: {
-                movie_id: movie_id
+                movieId: movieId
             },
-            success:function (obj) {
+            success: function (obj) {
                 console.log(obj);
-                for(var i=0;i<obj.data.commentList.length;i++){
+                for (var i = 0; i < obj.data.commentvoList.length; i++) {
                     commentListContainer.append(
                         "<li class=\"comment-container\">" +
-                            "<div class=\"portrait-container\">" +
-                                "<div class=\"portrait\">" +
-                                    "<img src=\""+ obj.data.commentList[i].commentUser.userHeadImg +"\" alt=\"\">" +
-                                "</div>" +
-                                "<i class=\"level-4-icon\"></i>" +
-                            "</div>" +
-                            "<div class=\"main2\">" +
-                                "<div class=\"main2-header clearfix\">" +
-                                    "<div class=\"user\">" +
-                                        "<span class=\"name\">" + obj.data.commentList[i].commentUser.userName + "</span>	" +
-                                        "<span class=\"tag\">购</span>" +
-                                    "</div>" +
-                                    "<div class=\"time\" title=\"2018-11-16 12:06:10\">" +
-                                        "<span title=\"2018-11-16 12:06:10\">" + obj.data.commentList[i].commentTime + "</span>" +
-                                    "</div>" +
-                                    "<div class=\"approve\" data-id=\"1044884745\">" +
-                                    "</div>" +
-                                "</div>" +
-                                "<div class=\"comment-content\"> " +
-                                    obj.data.commentList[i].commentContent +
-                                "</div>" +
-                            "</div>" +
+                        "<div class=\"portrait-container\">" +
+                        "<div class=\"portrait\">" +
+                        "<img src=\"" + obj.data.commentvoList[i].commentUser.userHeadImg + "\" alt=\"\">" +
+                        "</div>" +
+                        "<i class=\"level-4-icon\"></i>" +
+                        "</div>" +
+                        "<div class=\"main2\">" +
+                        "<div class=\"main2-header clearfix\">" +
+                        "<div class=\"user\">" +
+                        "<span class=\"name\">" + obj.data.commentvoList[i].commentUser.userName + "</span>	" +
+                        "<span class=\"tag\">购</span>" +
+                        "</div>" +
+                        "<div class=\"time\" title=\"2018-11-16 12:06:10\">" +
+                        "<span title=\"2018-11-16 12:06:10\">" + obj.data.commentvoList[i].comment.commentTime + "</span>" +
+                        "</div>" +
+                        "<div class=\"approve\" data-id=\"1044884745\">" +
+                        "</div>" +
+                        "</div>" +
+                        "<div class=\"comment-content\"> " +
+                        obj.data.commentvoList[i].comment.commentContent +
+                        "</div>" +
+                        "</div>" +
                         "</ul>"
                     );
                 }
             }
         });
-    }else{
+    } else {
         user = eval('(' + user + ')');
-        console.log("====>"+user);
+        console.log("====>" + user);
         var user_role = user.userRole;  //身份验证
         var user_name = user.userName;
         var html;
         $.ajax({
-            type:'post',
-            url: url + "/movie/findMovieById",
-            dataType:'json',
+            type: 'post',
+            url: url + "/movie/loadMovieDetail",
+            dataType: 'json',
             data: {
-                movie_id: movie_id
+                movieId: movieId
             },
-            success:function (obj) {
+            success: function (obj) {
                 console.log(obj);
-                for(var i=0;i<obj.data.commentList.length;i++){
-                    if((user_role == 1) && (user_name == obj.data.commentList[i].commentUser.userName)){
-                        html =  "<div class=\"updateBtn\" onclick='updateConfirm(\"" + obj.data.commentList[i].commentId + "\",\"" + obj.data.commentList[i].commentUser.userName + "\",\"" + obj.data.commentList[i].commentContent + "\",\"" + obj.data.commentList[i].commentTime + "\")'>修改</div>" +
-                        "<div class=\"deleteCom\" onclick='deleteConfirm(\"" + obj.data.commentList[i].commentId + "\")'>删除</div>";
-                    }else if(user_role == 1){
-                        html = "<div class=\"deleteCom\" onclick='deleteConfirm(\"" + obj.data.commentList[i].commentId + "\")'>删除</div>";
-                    }else if((user_name == obj.data.commentList[i].commentUser.userName) && (user_role != 1)){
-                                html = "<div class=\"updateBtn\" onclick='updateConfirm(\"" + obj.data.commentList[i].commentId + "\",\"" + obj.data.commentList[i].commentUser.userName + "\",\"" + obj.data.commentList[i].commentContent + "\",\"" + obj.data.commentList[i].commentTime + "\")'>修改</div>";
-                    }else{
-                        html="";
-                    }   
+                for (var i = 0; i < obj.data.commentvoList.length; i++) {
+                    if ((user_role == 1) && (user_name == obj.data.commentvoList[i].commentUser.userName)) {
+                        html = "<div class=\"updateBtn\" onclick='updateConfirm(\"" + obj.data.commentvoList[i].comment.commentId + "\",\"" + obj.data.commentvoList[i].commentUser.userName + "\",\"" + obj.data.commentvoList[i].comment.commentContent + "\",\"" + obj.data.commentvoList[i].comment.commentTime + "\")'>修改</div>" +
+                            "<div class=\"deleteCom\" onclick='deleteConfirm(\"" + obj.data.commentvoList[i].comment.commentId + "\")'>删除</div>";
+                    } else if (user_role == 1) {
+                        html = "<div class=\"deleteCom\" onclick='deleteConfirm(\"" + obj.data.commentvoList[i].comment.commentId + "\")'>删除</div>";
+                    } else if ((user_name == obj.data.commentvoList[i].commentUser.userName) && (user_role != 1)) {
+                        html = "<div class=\"updateBtn\" onclick='updateConfirm(\"" + obj.data.commentvoList[i].comment.commentId + "\",\"" + obj.data.commentvoList[i].commentUser.userName + "\",\"" + obj.data.commentvoList[i].comment.commentContent + "\",\"" + obj.data.commentvoList[i].comment.commentTime + "\")'>修改</div>";
+                    } else {
+                        html = "";
+                    }
                     commentListContainer.append(
                         "<li class=\"comment-container\">" +
-                            "<div class=\"portrait-container\">" +
-                                "<div class=\"portrait\">" +
-                                    "<img src=\""+ obj.data.commentList[i].commentUser.userHeadImg +"\" alt=\"\">" +
-                                "</div>" +
-                                "<i class=\"level-4-icon\"></i>" +
-                            "</div>" +
-                            "<div class=\"main2\">" +
-                                "<div class=\"main2-header clearfix\">" +
-                                    "<div class=\"user\">" +
-                                        "<span class=\"name\">" + obj.data.commentList[i].commentUser.userName + "</span>	" +
-                                        "<span class=\"tag\">购</span>" +
-                                    "</div>" +
-                                    "<div class=\"time\" title=\"2018-11-16 12:06:10\">" +
-                                        "<span title=\"2018-11-16 12:06:10\">" + obj.data.commentList[i].commentTime + "</span>" +
-                                    "</div>" +
-                                    "<div class=\"approve\" data-id=\"1044884745\">" +
-                                        html +
-                                    "</div>" +
-                                "</div>" +
-                                "<div class=\"comment-content\"> " +
-                                    obj.data.commentList[i].commentContent +
-                                "</div>" +
-                            "</div>" +
+                        "<div class=\"portrait-container\">" +
+                        "<div class=\"portrait\">" +
+                        "<img src=\"" + obj.data.commentvoList[i].commentUser.userHeadImg + "\" alt=\"\">" +
+                        "</div>" +
+                        "<i class=\"level-4-icon\"></i>" +
+                        "</div>" +
+                        "<div class=\"main2\">" +
+                        "<div class=\"main2-header clearfix\">" +
+                        "<div class=\"user\">" +
+                        "<span class=\"name\">" + obj.data.commentvoList[i].commentUser.userName + "</span>	" +
+                        "<span class=\"tag\">购</span>" +
+                        "</div>" +
+                        "<div class=\"time\" title=\"2018-11-16 12:06:10\">" +
+                        "<span title=\"2018-11-16 12:06:10\">" + obj.data.commentvoList[i].comment.commentTime + "</span>" +
+                        "</div>" +
+                        "<div class=\"approve\" data-id=\"1044884745\">" +
+                        html +
+                        "</div>" +
+                        "</div>" +
+                        "<div class=\"comment-content\"> " +
+                        obj.data.commentvoList[i].comment.commentContent +
+                        "</div>" +
+                        "</div>" +
                         "</ul>"
                     );
                 }
@@ -117,32 +118,31 @@ function init_comment(){
 }
 
 //初始化
-function initHeader(){
+function initHeader() {
     var LayuiNavMore = $(".header-li");
     console.log(LayuiNavMore);
     var user_json = JSON.parse(localStorage.getItem("userJson"));
     console.log(user_json);
-    layui.use('element', function(){
+    layui.use('element', function () {
         var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
         //监听导航点击
-        element.on('nav(demo)', function(elem){
+        element.on('nav(demo)', function (elem) {
             //console.log(elem)
             layer.msg(elem.text());
         });
     });
-    if(user_json == null){
+    if (user_json == null) {
         LayuiNavMore.append(
             "<a href=\"javascript:;\" style=\"padding: 0;height: 42px; width: 42px;\"><img src=\"static/images/head.jpg\" class=\"layui-nav-img\"></a>" +
             "<dl class=\"layui-nav-child nav-image\">" +
-                "<dd><a href=\"./login.jsp\">登录</a></dd>" +
+            "<dd><a href=\"./login.jsp\">登录</a></dd>" +
             "</dl>"
         );
-    }
-    else{
+    } else {
         var HeadImg = "";
-    	if(user_json.user_headImg == null || typeof user_json.user_headImg == "undefined"){
+        if (user_json.user_headImg == null || typeof user_json.user_headImg == "undefined") {
             HeadImg = "upload/head/demo.jpg";
-        }else{
+        } else {
             HeadImg = user_json.user_headImg;
         }
         LayuiNavMore.append(
@@ -151,33 +151,36 @@ function initHeader(){
             "<dd><a href=\"./center.jsp\" onclick=\"mycenter()\">我的订单</a></dd>" +
             "<hr/>" +
             "<dd><a href=\"./center.jsp\" onclick=\"myinformation()\">基本信息</a></dd>" +
-                "<hr/>" +
-                "<dd><a onclick=\"ReLogin()\" style=\"text-decoration: none; cursor: pointer;\">注销</a></dd>" +
-                "<hr/>" +
+            "<hr/>" +
+            "<dd><a onclick=\"ReLogin()\" style=\"text-decoration: none; cursor: pointer;\">注销</a></dd>" +
+            "<hr/>" +
             "</dl>"
         );
         init_manage();
     }
 
 }
-function mycenter(){
-    localStorage.setItem("usercardId",0);
+
+function mycenter() {
+    localStorage.setItem("usercardId", 0);
 }
-function myinformation(){
-    localStorage.setItem("usercardId",1);
+
+function myinformation() {
+    localStorage.setItem("usercardId", 1);
 }
+
 //注销
-function ReLogin(){
-    layui.use(['layer'], function(){
-    var layer = layui.layer;
-        layer.alert('确认要注销吗？',{icon: 0,offset: clientHeight/5},
-            function (){
+function ReLogin() {
+    layui.use(['layer'], function () {
+        var layer = layui.layer;
+        layer.alert('确认要注销吗？', {icon: 0, offset: clientHeight / 5},
+            function () {
                 $.ajax({
-                    type:'post',
+                    type: 'post',
                     url: url + "/user/logout",
-                    dataType:'json',
+                    dataType: 'json',
                     data: {},
-                    success:function (obj) {
+                    success: function (obj) {
                         localStorage.removeItem('userJson');
                         layer.closeAll();
                         window.location.href = "./mainPage.jsp";

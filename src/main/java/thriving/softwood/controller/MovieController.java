@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import thriving.softwood.api.LoadMovieApi;
 import thriving.softwood.common.result.Result;
+import thriving.softwood.pojo.dto.MovieDTO;
 import thriving.softwood.pojo.vo.HomePageVO;
+import thriving.softwood.pojo.vo.MovieDetailVO;
 import thriving.softwood.pojo.vo.MovieListVO;
 
 /**
@@ -35,9 +37,18 @@ public class MovieController {
     }
 
     @RequestMapping("/loadMovieList")
-    public Result<MovieListVO> loadMovieList(String sortType) {
+    public Result<MovieListVO> loadMovieList(MovieDTO dto) {
         try {
-            return Result.success(loadMovieApi.loadBySortType(sortType));
+            return Result.success(loadMovieApi.loadBySortType(dto));
+        } catch (Exception e) {
+            return Result.error(INTERNAL_SERVER_ERROR.code(), e.getLocalizedMessage());
+        }
+    }
+
+    @RequestMapping("/loadMovieDetail")
+    public Result<MovieDetailVO> loadMovieDetail(Integer movieId) {
+        try {
+            return Result.success(loadMovieApi.loadMovieDetailById(movieId));
         } catch (Exception e) {
             return Result.error(INTERNAL_SERVER_ERROR.code(), e.getLocalizedMessage());
         }

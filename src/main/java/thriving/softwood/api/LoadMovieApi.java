@@ -1,6 +1,8 @@
 package thriving.softwood.api;
 
+import thriving.softwood.pojo.dto.MovieDTO;
 import thriving.softwood.pojo.vo.HomePageVO;
+import thriving.softwood.pojo.vo.MovieDetailVO;
 import thriving.softwood.pojo.vo.MovieListVO;
 
 /**
@@ -10,5 +12,7 @@ import thriving.softwood.pojo.vo.MovieListVO;
 public interface LoadMovieApi {
     HomePageVO loadHomePage();
 
-    MovieListVO loadBySortType(String order);
+    MovieListVO loadBySortType(MovieDTO dto);
+
+    MovieDetailVO loadMovieDetailById(Integer movieId);
 }

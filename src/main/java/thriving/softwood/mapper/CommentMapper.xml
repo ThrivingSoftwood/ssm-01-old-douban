@@ -15,6 +15,26 @@
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
+
+    <!--手动方法 begin-->
+    <select id="list" parameterType="thriving.softwood.pojo.dto.CommentDTO" resultMap="BaseResultMap">
+        select id, user_id, comment_content, movie_id, comment_time, create_time, update_time
+        from comment
+        <where>
+            <if test="movieId != null">
+                and movie_id = #{movieId}
+            </if>
+        </where>
+        <if test="orderByClause != null and !orderByClause.isEmpty()">
+            <foreach collection="orderByClause" index="key" item="value" open="order by" separator="," close="">
+                ${key} ${value}
+            </foreach>
+        </if>
+    </select>
+
+    <!--手动方法 end-->
+
+
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         <!--
           WARNING - @mbg.generated

@@ -27,14 +27,41 @@
     </resultMap>
 
     <!--手动方法 begin-->
-    <select id="list" parameterType="thriving.softwood.pojo.dto.MovieQryDTO" resultMap="BaseResultMap">
+
+    <select id="get" parameterType="thriving.softwood.pojo.dto.MovieDTO" resultMap="BaseResultMap">
         select id, movie_cn_name, movie_fg_name, movie_actor, movie_director, movie_detail,
         movie_duration, movie_type, movie_score, movie_box_office, movie_comment_count, movie_release_date,
-        movie_country, movie_picture, movie_state
+        movie_country, movie_picture, movie_state, create_time, update_time
+        from movie
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+        </where>
+        limit 1
+    </select>
+
+
+    <select id="list" parameterType="thriving.softwood.pojo.dto.MovieDTO" resultMap="BaseResultMap">
+        select id, movie_cn_name, movie_fg_name, movie_actor, movie_director, movie_detail,
+        movie_duration, movie_type, movie_score, movie_box_office, movie_comment_count, movie_release_date,
+        movie_country, movie_picture, movie_state, create_time, update_time
         from movie
         <where>
             <if test="movieState != null">
                 and movie_state = #{movieState}
+            </if>
+            <if test="movieType !=null and movieType != ''">
+                and movie_type like concat('%',#{movieType},'%')
+            </if>
+            <if test="movieCountry !=null and movieCountry != ''">
+                and movie_country like concat('%',#{movieCountry},'%')
+            </if>
+            <if test="movieReleaseYear !=null and movieReleaseYear != ''">
+                and year(a.movie_release_date) = #{movieReleaseYear}
+            </if>
+            <if test="minScore !=null">
+                and movie_score >= #{minScore}
             </if>
         </where>
         <if test="orderByClause != null and !orderByClause.isEmpty()">
@@ -43,6 +70,7 @@
             </foreach>
         </if>
     </select>
+
     <!--手动方法 end-->
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
